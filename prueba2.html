@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style3.css">
+    <title>AUREAJEWELRYGT</title>
+    <style>
+        body {
+            font-family: Times New Roman, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        h2 {
+            margin-top: 20px;
+        }
+
+        form {
+            margin: 20px;
+        }
+
+        form input[type="text"], form input[type="file"], form input[type="number"] {
+            padding: 10px;
+            margin: 10px 0;
+            width: 200px;
+        }
+
+        .boton-agregar, .boton-borrar {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .boton-borrar {
+            background-color: #DC3545;
+        }
+
+        .boton-nuevo {
+            margin-top: 20px;
+            background-color: #28A745;
+        }
+
+        .boton-salir {
+            margin-top: 20px;
+            background-color: #DC3545;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Aureajewelrygt</h1>
+
+        <nav>
+            <ul>
+                <li><a onclick="mostrarProductos('accesorios')">ACCESORIOS</a></li>
+                <li><a onclick="mostrarProductos('joyeria')">JOYERÍA</a></li>
+                <li><a onclick="mostrarSeccionNosotros()">NOSOTROS</a></li>
+            </ul>
+        </nav>
+
+        <div class="envio-gratis">
+            El método de pago varía por el sector donde se encuentre
+        </div>
+    </header>
+
+    <h2>Lista de Productos</h2>
+    <div id="lista-productos"></div>
+
+    <div id="carrusel-imagenes">
+        <img src="1.jpg" alt="Imagen 1" class="carrusel-imagen">
+        <img src="1.jpg" alt="Imagen 2" class="carrusel-imagen">
+    </div>
+    <button class="boton-navegacion left" onclick="cambiarImagen(-1)">◀</button>
+    <button class="boton-navegacion right" onclick="cambiarImagen(1)">▶</button>
+    
+    <section id="productos">
+        <h2>Nuestros Productos</h2>
+        <div class="productos-grid" id="productos-grid">
+            <!-- Productos van aquí -->
+        </div>
+    </section>
+
+    <section id="nosotros">
+        <h2>Sobre Nosotros</h2>
+        <p>Somos AureaJewelryGT, dedicados a ofrecerte las mejores piezas de joyería y accesorios de alta calidad.</p>
+        <p>Nuestra misión es brindarte una experiencia única con productos que resaltan tu estilo y personalidad.</p>
+    </section>
+
+    <!-- Inicio de sesión -->
+    <div>
+        <button class="login-boton" onclick="toggleLogin()">Iniciar Sesión</button>
+        <div class="login-form" id="login-form">
+            <input type="text" id="usuario" placeholder="Usuario" required>
+            <input type="password" id="contrasena" placeholder="Contraseña" required>
+            <button onclick="iniciarSesion()">Acceder</button>
+        </div>
+    </div>
+
+    <!-- Sección para agregar productos (inicialmente oculta) -->
+    <div id="seccion-agregar-productos" style="display: none;">
+        <h2>Agregar Nuevo Producto</h2>
+        <form id="form-agregar-producto">
+            <input type="text" id="nombre-producto" placeholder="Nombre del Producto" required>
+            <input type="number" id="precio-producto" placeholder="Precio" required>
+            <input type="file" id="imagen-producto" accept="image/*" required>
+            <button type="button" class="boton-agregar" onclick="agregarProducto()">Agregar Producto</button>
+        </form>
+        <button class="boton-nuevo" onclick="agregarOtroProducto()">Agregar Otro Producto</button>
+        <button class="boton-salir" onclick="salir()">Salir</button>
+    </div>
+
+    <div id="carrito">
+        <h3>Carrito</h3>
+        <ul id="carrito-items"></ul>
+        <p>Total: $<span id="carrito-total">0.00</span></p>
+        <button class="boton-whatsapp" onclick="abrirWhatsApp()">Contactar por WhatsApp</button>
+        <button onclick="vaciarCarrito()">Vaciar Carrito</button>
+    </div>
+
+    <button class="carrito-boton" onclick="mostrarCarrito()">
+        <img src="bolsaa.jpg" alt="Carrito de compras">
+    </button>
+
+    <footer>
+        <p>&copy; 2023 AureaJewelryGT. Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        let indiceImagen = 0;
+        let esAdmin = false;
+
+        function cambiarImagen(direccion) {
+            const imagenes = document.querySelectorAll('.carrusel-imagen');
+            indiceImagen = (indiceImagen + direccion + imagenes.length) % imagenes.length;
+            imagenes.forEach((img, idx) => {
+                img.style.transform = `translateX(${(idx - indiceImagen) * 100}%)`;
+            });
+        }
+
+        function abrirWhatsApp() {
+            const telefono = "50259221427";
+            const mensaje = encodeURIComponent("¡Hola! Me gustaría obtener más información sobre sus productos.");
+            const url = `https://wa.me/${telefono}?text=${mensaje}`;
+            window.open(url, '_blank');
+        }
+
+        const carrito = [];
+        function añadirAlCarrito(nombre, precio) {
+            carrito.push({ nombre, precio });
+            actualizarCarrito();
+        }
+
+        function actualizarCarrito() {
+            const carritoItemsDiv = document.getElementById('carrito-items');
+            carritoItemsDiv.innerHTML = '';
+            let total = 0;
+
+            carrito.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = `${item.nombre} - $${item.precio}`;
+                carritoItemsDiv.appendChild(li);
+                total += item.precio;
+            });
+
+            document.getElementById('carrito-total').textContent = total.toFixed(2);
+        }
+
+        function mostrarCarrito() {
+            const carritoDiv = document.getElementById('carrito');
+            carritoDiv.style.display = carritoDiv.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function vaciarCarrito() {
+            carrito.length = 0;
+            actualizarCarrito();
+            mostrarCarrito(); // Cierra el carrito después de vaciarlo
+        }
+
+        function mostrarSeccionNosotros() {
+            document.getElementById('nosotros').style.display = 'block';
+            document.getElementById('productos').style.display = 'none';
+        }
+
+        function mostrarProductos(seccion) {
+            const productosGrid = document.getElementById('productos-grid');
+            productosGrid.innerHTML = ''; // Limpiar contenido anterior
+
+            const productos = JSON.parse(localStorage.getItem('productos')) || [];
+            const productosFiltrados = productos.filter(producto => producto.seccion === seccion);
+
+            productosFiltrados.forEach((producto, index) => {
+                const divProducto = document.createElement('div');
+                divProducto.className = 'producto';
+                divProducto.innerHTML = `
+                    <h3>${producto.nombre}</h3>
+                    <p>Precio: $${producto.precio}</p>
+                    <img src="${producto.imagen}" alt="${producto.nombre}" style="width:100px;height:100px;">
+                    <button class="boton" onclick="añadirAlCarrito('${producto.nombre}', ${producto.precio})">Añadir al Carrito</button>
+                    ${esAdmin ? `<button class="boton-borrar" onclick="borrarProducto(${index})">Borrar</button>` : ''}
+                `;
+                productosGrid.appendChild(divProducto);
+            });
+            document.getElementById('productos').style.display = 'block';
+            document.getElementById('nosotros').style.display = 'none'; // Ocultar sección "Nosotros"
+        }
+
+        function iniciarSesion() {
+            const usuario = document.getElementById('usuario').value;
+            const contrasena = document.getElementById('contrasena').value;
+
+            // Simulamos la validación de usuario
+            if (usuario === 'admin' && contrasena === '12345') {
+                alert('Inicio de sesión exitoso.');
+                document.getElementById('seccion-agregar-productos').style.display = 'block';
+                esAdmin = true;
+                mostrarProductos('joyeria');
+            } else {
+                alert('Usuario o contraseña incorrectos.');
+            }
+        }
+
+        function agregarProducto() {
+            const nombre = document.getElementById('nombre-producto').value;
+            const precio = parseFloat(document.getElementById('precio-producto').value);
+            const imagen = document.getElementById('imagen-producto').files[0];
+
+            const lector = new FileReader();
+            lector.onloadend = function() {
+                const productos = JSON.parse(localStorage.getItem('productos')) || [];
+                productos.push({
+                    nombre,
+                    precio,
+                    imagen: lector.result,
+                    seccion: 'joyeria'
+                });
+                localStorage.setItem('productos', JSON.stringify(productos));
+                mostrarProductos('joyeria');
+                document.getElementById('form-agregar-producto').reset();
+            };
+            lector.readAsDataURL(imagen);
+        }
+
+        function borrarProducto(index) {
+            const productos = JSON.parse(localStorage.getItem('productos')) || [];
+            productos.splice(index, 1);
+            localStorage.setItem('productos', JSON.stringify(productos));
+            mostrarProductos('joyeria');
+        }
+
+        function agregarOtroProducto() {
+            document.getElementById('form-agregar-producto').reset();
+        }
+
+        function salir() {
+            document.getElementById('seccion-agregar-productos').style.display = 'none';
+            esAdmin = false;
+        }
+
+        function toggleLogin() {
+            const loginForm = document.getElementById('login-form');
+            loginForm.style.display = loginForm.style.display === 'none' ? 'block' : 'none';
+        }
+    </script>
+</body>
+</html>
